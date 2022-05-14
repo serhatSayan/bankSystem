@@ -1,4 +1,7 @@
 
+from asyncio.windows_events import NULL
+
+
 class mudur():
     def __init__(self):
         pass
@@ -70,6 +73,22 @@ class mudur():
 
         return islemler
 
-    def deadlock(self, islemler):
+    def deadlockAnalizi(self, islemler):
         
+        for x in islemler:
+
+            if islemler[x][2]==NULL:
+                continue
+
+            for y in range(x+1, islemler):
+                if islemler[x][7]==islemler[y][7]:
+                    if islemler[x][2] == islemler[y][3]:
+                       if islemler[x][3] == islemler[y][2]:
+                           eklenecek = [islemler[x][1], islemler[y][1]]
+                           tekilDeadlocklar = tekilDeadlocklar.append(eklenecek)
+
+        #ayrık deadlockları birleştirme
+        for x in tekilDeadlocklar:
+            pass
+
         pass

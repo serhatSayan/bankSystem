@@ -180,7 +180,7 @@ class musteri():
 
 #--------methods which only used inside instance--------
 
-    #gönderilen para miktarının, alıcının kurundaki miktarını bulmak için gereken değeri döndürür
+    #gönderilen para miktarının, alıcının kurundaki miktarını bulmak için gereken değeri (FLOAT) döndürür
     def kurDonustur(self, connector, kaynakID, hedefID):
         with connector.cursor() as cursor:
             kaynakKurType = f"""SELECT curTYPE FROM hesaplar WHERE hesapID={kaynakID}"""

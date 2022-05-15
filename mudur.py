@@ -73,22 +73,83 @@ class mudur():
 
         return islemler
 
+    #untested
     def deadlockAnalizi(self, islemler):
-        
-        for x in islemler:
 
+        tariheGoreUniqueHesaplar = []
+        tariheGoreZincirler = []
+        tariheGoreIslemVektorler = []
+        tarihIndex = -1
+        tariheGoreDeadlocklar = []
+
+        # Deadlock analizini yapmak için islemlerin yaptığı dairesel hareketleri bulmamız gerekiyor. Bunun için
+        # islemlerin hangi hesaplar arasında gerçekleştiği bulunmalıdır ve bu bulgular ilişkilendirilerek zincirler
+        # oluşturulmalıdır. Daha sonra oluşturulan zincirler incelenerek dairesel hareketler tespit edilmelidir.
+        # Worst case olan en uzun zincir, (sistemdeki özgün hesap sayısı-1) işlem içereceği için bu işlem hesap
+        # sayısı kadar tekrarlanır. (uniqueHesaplar bu değeri belirlemek için hesaplanır)
+        for x in islemler:
             if islemler[x][2]==NULL:
                 continue
+            elif islemler[x][3]==NULL:
+                continue
+            # islemler[x][2]!=NULL and islemler[x][3]!=NULL
+            else:
+                
+                # islemleri tarihlerine göre gruplamak için listeyi yeni bir tarihle karşılaşıldığında genişletir
+                if sonKarsılasılanTarih != islemler[x][7]:
+                    sonKarsılasılanTarih = islemler[x][7]
+                    tariheGoreUniqueHesaplar.append([])
+                    tariheGoreIslemVektorler.append([])
+                    tariheGoreDeadlocklar.append([])
+                    tarihIndex = tarihIndex+1
+                
+                # İslemin kaynak veya hedef hesabı daha önce karşılaşılmış mı? 
+                # Karşılaşılmamışsa hesapları tariheGoreUniqueHesaplar'a ekle
+                if not tariheGoreUniqueHesaplar[tarihIndex].count(islemler[x][2]):
+                    tariheGoreUniqueHesaplar[tarihIndex].append(islemler[x][2])
+                if not tariheGoreUniqueHesaplar[tarihIndex].count(islemler[x][3]):
+                    tariheGoreUniqueHesaplar[tarihIndex].append(islemler[x][3])
 
-            for y in range(x+1, islemler):
-                if islemler[x][7]==islemler[y][7]:
-                    if islemler[x][2] == islemler[y][3]:
-                       if islemler[x][3] == islemler[y][2]:
-                           eklenecek = [islemler[x][1], islemler[y][1]]
-                           tekilDeadlocklar = tekilDeadlocklar.append(eklenecek)
+                
+                atomicIslem = [islemler[x][2], islemler[x][3]]
+                if not tariheGoreIslemVektorler[tarihIndex].count(atomicIslem):
+                    tariheGoreIslemVektorler[tarihIndex].append(atomicIslem)
 
-        #ayrık deadlockları birleştirme
-        for x in tekilDeadlocklar:
-            pass
+
+        tariheGoreZincirler = tariheGoreIslemVektorler
+
+        # zincir oluşturma aşaması
+        for i in range((len(tariheGoreUniqueHesaplar))):
+            tempZincirler = []
+
+            # i indexindeki zincirleri bulur
+            for _ in range(len(tariheGoreUniqueHesaplar[i])):
+                for j in range(len(tariheGoreZincirler[i])):
+                    for k in range((len(tariheGoreIslemVektorler[i]))):
+                        
+                        #eğer zincir dairesel hareket yapmışsa onu tarihine uygun deadlock listesine ekler
+                        if tariheGoreZincirler[i][j][-1]==tariheGoreIslemVektorler[i][k][0]:
+                            tempZincirler.append(tariheGoreZincirler[i][j]+(tariheGoreIslemVektorler[i][k][2]))
+                            if tempZincirler[-1][0]==tempZincirler[-1][-1]:
+                                tariheGoreDeadlocklar[i].append(tempZincirler.pop())
+
+            tariheGoreZincirler[i] = tempZincirler
+            
+            # Dairesel hareketler incelenirken hangi zincirin hangi hesaptan başladığına göre farklı zincirler aynı
+            # deadlocku temsil edebilir, deadlock sayısının doğru hesaplanabilmesi için her deadlock bir zincirle temsil
+            # edilmelidir
+            # Bunu sağlamak için kopya zincirlerden kurtulmalıyız
+
+            for t in range(len(tariheGoreDeadlocklar)):
+                for y in range(len(tariheGoreDeadlocklar[t])-1):
+                    if len(tariheGoreDeadlocklar[t][y])==len(tariheGoreDeadlocklar[t][y+1]):
+                        if sorted(set(tariheGoreDeadlocklar[t][y])) == sorted(set(tariheGoreDeadlocklar[t+1][y+1])):
+                            del tariheGoreDeadlocklar[t+1][y+1]
+                            y = y-1
+                            continue
+
+                        
+                            
+
 
         pass

@@ -46,24 +46,20 @@ class musteri():
         with connector.cursor() as cursor:
 
             bakiyeGoster = f"SELECT bakiye FROM hesaplar WHERE hesapID={hesapID}"
-            cursor = connector.cursor()
             cursor.execute(bakiyeGoster)
             bakiye = cursor.fetchone()
 
             yeniBakiye = bakiye[0]+miktar
             bakiyeArt = f"UPDATE hesaplar SET bakiye = {yeniBakiye} WHERE hesapID = {hesapID}"
-            cursor = connector.cursor()
             cursor.execute(bakiyeArt)
 
-            tarihCek = "SELECT tarih FROM bankValues ORDER BY tarih LIMIT 1"
-            cursor = connector.cursor()
+            tarihCek = "SELECT tarih FROM bankValues ORDER BY tarih DESC LIMIT 1"
             cursor.execute(tarihCek)
             tarih = cursor.fetchone()
             tarih = tarih[0]
 
             islemOlustur = f"""INSERT INTO islemler (islemTYPE, hedefID, tutar, hedefBAKIYE, tarih)
                             VALUES ("Para Yatırma", {hesapID}, {miktar}, {bakiye[0]}, {tarih})"""
-            cursor = connector.cursor()
             cursor.execute(islemOlustur)
 
         connector.commit()    
@@ -91,6 +87,14 @@ class musteri():
     def hesapSilTalep(self, connector, hedefID):
         
         with connector.cursor() as cursor:
+
+            bakiyeGoster = f"SELECT bakiye FROM hesaplar WHERE hesapID={hedefID}"
+            cursor.execute(bakiyeGoster)
+            bakiye = cursor.fetchone()
+
+            if bakiye != 0.0:
+                return "Bu islemi gerceklestirebilmek icin bakiyenizin sıfır(0) olması gerek."
+
             talepOlustur = f"""INSERT INTO talepler (musID, talepTYPE, hedefID) 
                         VALUES ({self.kendiID}, "Hesap Silme", {hedefID})"""
             
@@ -178,7 +182,7 @@ class musteri():
 
 
 
-#--------methods which only used inside instance--------
+#--------method(s) which only used inside instance of this class--------
 
     #gönderilen para miktarının, alıcının kurundaki miktarını bulmak için gereken değeri (FLOAT) döndürür
     def kurDonustur(self, connector, kaynakID, hedefID):

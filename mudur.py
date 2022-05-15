@@ -154,5 +154,5 @@ class mudur():
                         
                             
 
-
-        pass
+        # tariheGoreDeadlocklar is a list of list
+        return tariheGoreDeadlocklar

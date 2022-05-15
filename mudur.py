@@ -7,9 +7,12 @@ class mudur():
     def __init__(self):
         pass
 
-    def getGenelDurum(self):
+    def getGenelDurum(self, connector):
         genelToGet = hesap(1)
-        genelToGet
+        bakiye = genelToGet.getHesapBakiye(connector)
+        gelirGider = genelToGet.getGelirGider(connector)
+
+        return [bakiye, gelirGider[0], gelirGider[1]]
 
 
     def curEkle(self, connector, curAd, curKur):

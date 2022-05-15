@@ -141,13 +141,16 @@ class mudur():
             # Bunu sağlamak için kopya zincirlerden kurtulmalıyız
 
             for t in range(len(tariheGoreDeadlocklar)):
-                for y in range(len(tariheGoreDeadlocklar[t])-1):
-                    if len(tariheGoreDeadlocklar[t][y])==len(tariheGoreDeadlocklar[t][y+1]):
-                        if sorted(set(tariheGoreDeadlocklar[t][y])) == sorted(set(tariheGoreDeadlocklar[t+1][y+1])):
-                            del tariheGoreDeadlocklar[t+1][y+1]
-                            y = y-1
-                            continue
-
+                z = 0
+                while z < len(tariheGoreDeadlocklar[t])-1:
+                    
+                    f = z+1
+                    while f < len(tariheGoreDeadlocklar[t]):
+                    
+                        if len(tariheGoreDeadlocklar[t][y])==len(tariheGoreDeadlocklar[t][y+1]):
+                            if sorted(set(tariheGoreDeadlocklar[t][z])) == sorted(set(tariheGoreDeadlocklar[t+1][f])):
+                                del tariheGoreDeadlocklar[t+1][y+1]
+                        f += 1
                         
                             
 

@@ -1,5 +1,6 @@
 
 from asyncio.windows_events import NULL
+from hesap import hesap
 
 
 class mudur():
@@ -7,7 +8,9 @@ class mudur():
         pass
 
     def getGenelDurum(self):
-        pass
+        genelToGet = hesap(1)
+        genelToGet
+
 
     def curEkle(self, connector, curAd, curKur):
         with connector.cursor() as cursor:

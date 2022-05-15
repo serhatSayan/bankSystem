@@ -74,7 +74,12 @@ class temsilci():
             return musteriToEdit.bilgiUpdate(connector, adSoyad, tel, tc, adres, mail)
 
     def musGenel(self, connector, musID):
-        pass
+        with connector.cursor() as cursor:
+            musToSee = musteri(musID)
+            musGelirGiderGenel = musToSee.gelirGiderGenel()
+
+        return musGelirGiderGenel
+            
 
     def seeTalep(self, connector):
         pass

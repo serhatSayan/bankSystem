@@ -1,3 +1,5 @@
+from currency import currency
+from hesap import hesap
 
 class musteri():
     def __init__(self, musID) -> None:
@@ -208,3 +210,52 @@ class musteri():
             hedefKur = hedefKur[0]
 
         return kaynakKur/hedefKur
+
+    def gelirGiderGenel(self, connector):
+        gelir = 0
+        gider = 0
+        genel = self.getMusBakiye(connector)
+
+        with connector.cursor() as cursor:
+            tarihCek = "SELECT tarih FROM bankValues ORDER BY tarih LIMIT 1"
+            cursor = connector.cursor()
+            cursor.execute(tarihCek)
+            tarih = cursor.fetchone()
+            tarih = tarih[0]
+
+            islemler = self.getAylıkOzet()
+
+            for i in islemler:
+                if i[1] == "Para Yatırma":
+                    gelir = gelir + i[4]
+                elif i[1] == "Para Cekme":
+                    gider = gider + i[4]
+
+        
+
+        return  [gelir, gider, genel]
+
+    def getMusBakiye(self, connector):
+        toplamBakiye = 0
+        hesaplar = self.getHesaplar(connector)
+        
+        for x in hesaplar:
+            hesapToGet = hesap(x[0])
+            curToGet = currency(hesapToGet.getHesapCur(connector))
+            curCarpani = 1 / curToGet.getCurKur(connector)
+            bakiye = hesapToGet.getHesapBakiye(connector)
+            miktar = bakiye * curCarpani
+
+            toplamBakiye = toplamBakiye + miktar
+
+        return toplamBakiye
+
+    def getHesaplar(self, connector):
+        with connector.cursor() as cursor:
+            getHesaplar = f"""SELECT hesapID FROM hesaplar 
+                            WHERE musID = {self.kendiID}"""
+            cursor.execute(getHesaplar)
+
+            #hesaplar is a list of tuples 
+            return cursor.fetchall()
+   
